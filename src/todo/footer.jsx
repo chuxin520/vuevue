@@ -1,4 +1,5 @@
 import '../styles/footer.css'
+// import 'style-loader!css-loader!../styles/footer.css';
 //styl  文件要拆分出去
 export default {
     data(){

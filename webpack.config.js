@@ -1,7 +1,9 @@
 const path = require('path')                            //path是Nodejs中的基本包,用来处理路径
 const HTMLPlugin = require('html-webpack-plugin')       //引入html-webpack-plugin
 const webpack = require("webpack")                      //引入webpack
-const {VueLoaderPlugin} = require('vue-loader')               //引入webpack
+// const {VueLoaderPlugin} = require('vue-loader')               //引入webpack
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+//引入webpack
 const ExtractPlugin = require("extract-text-webpack-plugin")
 
 const isDev = process.env.NODE_ENV === "development"    //判断是否为测试环境,在启动脚本时设置的环境变量都是存在于process.env这个对象里面的
@@ -23,13 +25,13 @@ const config = {
                 test: /\.jsx$/,
                 loader: 'babel-loader'                  //处理jsx文件
             },
-            // {
-            //     test: /\.css$/,
-            //     use: [
-            //         'style-loader',                     //将css的样式写入到html里面去
-            //         'css-loader'                        //处理css文件  
-            //     ]
-            // },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',                     //将css的样式写入到html里面去
+                    'css-loader',                        //处理css文件
+                ]
+            },
             {
                 test: /\.(gif|jpg|jpeg|png|svg)$/,      //处理图片
                 use: [
@@ -45,12 +47,12 @@ const config = {
         ]
     },
     plugins:[
+        new VueLoaderPlugin(),
         new webpack.DefinePlugin({                      //主要作用是在此处可以根据isdev配置process.env,一是可以在js代码中可以获取到process.env,
             'process.env':{                             //二是webpack或则vue等根据process.env如果是development,会给一些特殊的错误提醒等,而这些特殊项在正式环境是不需要的
                 NODE_ENV: isDev ? '"development"' : '"production"'
             }
         }),
-        new VueLoaderPlugin(),
         new HTMLPlugin(),                          //引入HTMLPlugin
 
     ]
@@ -58,27 +60,27 @@ const config = {
 
 if(isDev){
     config.module.rules.push(
-        {
-            test: /\.styl/,
-            use: [
-                'style-loader',                     //将css写入到html中去
-                'css-loader',                       //css-loader处理css
-                {
-                    loader: 'postcss-loader',
-                    options: {
-                        sourceMap: true,            //stylus-loader和postcss-loader自己都会生成sourceMap,如果前面stylus-loader已生成了sourceMap
-                    }                               //那么postcss-loader可以直接引用前面的sourceMap
-                },
-                'stylus-loader'                     //处理stylus的css预处理器的问题件,转换成css后,抛给上一层的css-loader
-            ]
-        },
-         {
-             test: /\.css/,
-             use: [
-                 'style-loader',                     //将css的样式写入到html里面去
-                 'css-loader'                        //处理css文件
-             ]
-         }
+        // {
+        //     test: /\.styl/,
+        //     use: [
+        //         'style-loader',                     //将css写入到html中去
+        //         'css-loader',                       //css-loader处理css
+        //         {
+        //             loader: 'postcss-loader',
+        //             options: {
+        //                 sourceMap: true,            //stylus-loader和postcss-loader自己都会生成sourceMap,如果前面stylus-loader已生成了sourceMap
+        //             }                               //那么postcss-loader可以直接引用前面的sourceMap
+        //         },
+        //         'stylus-loader'                     //处理stylus的css预处理器的问题件,转换成css后,抛给上一层的css-loader
+        //     ]
+        // },
+        //  {
+        //      test: /\.css/,
+        //      use: [
+        //          'style-loader',                     //将css的样式写入到html里面去
+        //          'css-loader',                        //处理css文件
+        //      ]
+        //  }
     )                                             //如果是测试环境下的一些配置
     config.devtool = '#cheap-module-eval-source-map'    //官方推荐使用这个配置,作用是在浏览器中调试时,显示的代码和我们的项目中的代码会基本相似,而不会显示编译后的代码,以致于我们调试连自己都看不懂                                      
     config.devServer = {                                //这个devServer的配置是在webpack2.x以后引入的,1.x是没有的
